@@ -1,9 +1,22 @@
 package main
 
-import "fmt"
-import "rsc.io/quote"
+import (
+	"fmt"
+	"log"
+
+	"github.com/GoldenStain/GoBeginner/greetings"
+)
 
 func main() {
-	fmt.Println("Hello World!")
-	fmt.Println(quote.Go())
+	log.SetPrefix("greetings: ")
+	log.SetFlags(0)
+
+	names := []string{"1", "2", "3"}
+	messages, err := greetings.Hellos(names)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(messages)
 }
