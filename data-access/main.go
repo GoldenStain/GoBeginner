@@ -47,6 +47,34 @@ func main() {
 	}
 	fmt.Println("Connected!")
 
+	var toInsert string
+	fmt.Println("Do you want to insert a new row into the table alubm? (y/n)")
+	_, err = fmt.Scanln(&toInsert)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for {
+		if !notValid(toInsert) {
+			break
+		}
+		fmt.Println("Invalid input. Try again.")
+		_, err = fmt.Scanln(&toInsert)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	if toInsert == "y" || toInsert == "Y" {
+		albID, err := addAlbum(Album{
+			Title:  "The Modern Sound of Betty Carter",
+			Artist: "Betty Carter",
+			Price:  49.99,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("ID of added album: %v\n:", albID)
+	}
+
 	var albums []Album
 	var albumsKey string
 
@@ -108,4 +136,26 @@ func albumsByID(id int64) (Album, error) {
 		return album, fmt.Errorf("albumsByID %q: %v", id, err)
 	}
 	return album, nil
+}
+
+// addAlbum adds the specified album to the database,
+// returning the album ID of the new entry
+
+func addAlbum(alb Album) (int64, error) {
+	result, err := db.Exec("INSERT INTO album(title, artist, price) VALUES(?, ?, ?)", alb.Title, alb.Artist, alb.Price)
+	if err != nil {
+		return 0, fmt.Errorf("addAlbum: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("addAlbum: %v", err)
+	}
+	return id, nil
+}
+
+func notValid(toInsert string) bool {
+	if toInsert == "y" || toInsert == "Y" || toInsert == "n" || toInsert == "N" {
+		return false
+	}
+	return true
 }
